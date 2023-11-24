@@ -1,20 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
 import React, {useState} from 'react';
-import Encuestas from './Components/Encuestas';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Inicio from './Components/Inicio';
+import CrearEncuesta from './Components/CrearEncuesta';
+import Encuesta from './Components/Encuesta';
+import Menu from './Components/Menu';
+import NotFound from './Components/NotFound';
+
+import './styles/App.css';
+import encuestas from './data/encuestas.json'
 
 function App() {
-  const encuestas = [{ id: 1, pregunta: '¿Cuál es tu color favorito?', opciones:
-  ['Rojo', 'Azul', 'Verde'] },
-  { id: 2, pregunta: '¿Cuál es tu comida favorita?', opciones:
-  ['Pizza', 'Hamburguesa', 'Sushi'] },];
+  const [listaEncuestas, setListaEncuestas] = useState(encuestas)
+
+  const agregarEncuesta = (nuevaEncuesta) => {
+    nuevaEncuesta.id = listaEncuestas.length + 1
+    setListaEncuestas([...listaEncuestas, nuevaEncuesta]);
+  };
+
+  const responderEncuesta = (id, respuestas) => {
+    const encuesta = listaEncuestas.find(enc => enc.id === parseInt(id));
+    encuesta.preguntas.respuestas = [respuestas];
+  };
 
   return (
-    <div className="App">
-      <h1>Aplicacion de Encuestas</h1>
-      <Encuestas encuestas={encuestas} />
-    </div>
+    <BrowserRouter>
+      <Menu/>
+      <Routes>
+        <Route path="/" element={<Inicio listaEncuestas={listaEncuestas} />} />
+        <Route path="/encuesta/crear" element={<CrearEncuesta agregarEncuesta={agregarEncuesta} />} />
+        <Route path="/encuesta/:id" element={<Encuesta listaEncuestas={listaEncuestas} responderEncuesta={responderEncuesta} />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
